@@ -137,21 +137,12 @@ export default function App() {
           <p className="text-white">신한투자증권 백오피스</p>
         </div>
         <div className="flex items-center gap-[12px]">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="rounded-[10px] bg-transparent px-[16px] py-[8px] text-white hover:bg-white/10 border-0"
-          >
+          <button className="rounded-[10px] px-[16px] py-[8px] text-white transition-colors hover:bg-white/10">
             관리자: 홍길동
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            customColor="#ffffff"
-            className="rounded-[10px] px-[20px] py-[8px] text-[#155dfc] hover:bg-gray-100"
-          >
+          </button>
+          <button className="rounded-[10px] bg-white px-[20px] py-[8px] text-[#155dfc] transition-colors hover:bg-gray-100">
             로그아웃
-          </Button>
+          </button>
         </div>
       </div>
 

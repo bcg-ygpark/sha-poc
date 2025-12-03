@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://bridge-api-736820725831.asia-northeast3.run.app/api/:path*"
-    }
-  ]
-}
