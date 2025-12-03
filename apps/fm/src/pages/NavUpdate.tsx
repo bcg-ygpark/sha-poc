@@ -32,7 +32,7 @@ export default function NavUpdate() {
                   현재 기준가 (전일)
                 </p>
                 <div className="relative h-[48px]">
-                  <p className="font-['Pretendard_GOV:SemiBold',sans-serif] text-[48px] leading-[48px] text-[#00a63e]">
+              <p className="font-['Pretendard_GOV',sans-serif] font-semibold text-[48px] leading-[48px] text-[#00a63e]">
                     1,023.20
                   </p>
                   <p className="absolute left-[206px] top-[20px] font-['Pretendard_GOV:Regular',sans-serif] text-[16px] leading-[28px] text-[#4a5565]">
@@ -46,7 +46,7 @@ export default function NavUpdate() {
                   <p className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#6a7282]">
                     전일 수익률
                   </p>
-                  <p className="font-['Pretendard_GOV:SemiBold',sans-serif] text-[30px] leading-[36px] text-[#00a63e]">
+                  <p className="font-['Pretendard_GOV',sans-serif] font-semibold text-[30px] leading-[36px] text-[#00a63e]">
                     +0.05%
                   </p>
                   <p className="font-['Pretendard_GOV:Regular',sans-serif] text-[12px] leading-[20px] text-[#6a7282]">
@@ -64,24 +64,92 @@ export default function NavUpdate() {
         {/* 금일 NAV 계산 카드 */}
         <div className="bg-white w-full rounded-[10px] border border-gray-200 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]">
           <div className="flex flex-col gap-[24px] px-[33px] pb-px pt-[33px]">
-            <div className="relative h-[656px] w-full">
-              <div className="mb-[8px] h-[37px] border-b border-gray-200">
-                <p className="font-['Pretendard_GOV:SemiBold',sans-serif] text-[16px] leading-[24px] text-[#1e2939]">
-                  금일 NAV 계산 (2025.11.23)
-                </p>
-              </div>
+            <div className="mb-[8px] h-[37px] border-b border-gray-200">
+              <p className="font-['Pretendard_GOV',sans-serif] font-semibold text-[16px] leading-[24px] text-[#1e2939]">
+                금일 NAV 계산 (2025.11.23)
+              </p>
+            </div>
 
-              {/* 가운데 복잡한 그리드/요약은 sha-make-fm 구조 그대로 */}
-              <div className="relative mt-[16px] h-[600px]">
-                {/* 총 자산 / 채권 / 유동성 / 부채 / 순자산 / 총 좌수 등 텍스트만 표시 */}
-                {/* 이 부분은 디자인 정합성을 위해 원본과 동일한 내용을 그대로 유지 */}
-                {/* 실제 수치/텍스트는 sha-make-fm TokenIssuance와 동일 */}
+            {/* 금일 NAV 계산 내용 - sha-make-fm 구조를 참고한 실제 컨텐츠 */}
+            <div className="space-y-6">
+              {/* 총 자산 / 세부 자산 / 부채 / 순자산 / 총 좌수 */}
+              <div className="relative rounded-[10px] border border-gray-100 bg-white/60 px-6 py-5">
+                <dl className="space-y-3 text-[14px] text-[#1e2939]">
+                  {/* 총 자산 */}
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <dt className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#1e2939]">
+                      총 자산 (Total Assets)
+                    </dt>
+                    <dd className="font-['Pretendard_GOV',sans-serif] font-semibold text-[14px] leading-[24px] text-[#101828]">
+                      806,458,320,000 원
+                    </dd>
+                  </div>
 
-                {/* ...복잡한 내부 구조는 이미 TokenIssuance와 동일하게 FM 앱에 구현되어 있으므로,
-                    여기서는 고정 텍스트/레이블만 보여주는 간단한 구성으로 둡니다. */}
-                <p className="text-sm text-[#6a7282]">
-                  (상세 NAV 계산 영역은 디자인 시안과 동일하게 표시되며, 수치/레이블은 sha-make-fm 기준값을 사용합니다.)
-                </p>
+                  {/* 채권 */}
+                  <div className="flex items-center justify-between border-b border-[#b9f8cf] border-l-2 pl-4 pb-3">
+                    <dt className="flex items-center gap-[8px] font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#4a5565]">
+                      <span>채권</span>
+                      <span className="text-[13px] text-[#6a7282]">(93.0%)</span>
+                    </dt>
+                    <dd className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#101828]">
+                      750,000,000,000 원
+                    </dd>
+                  </div>
+
+                  {/* 유동성 자산 */}
+                  <div className="flex items-center justify-between border-b border-[#b9f8cf] border-l-2 pl-4 pb-3">
+                    <dt className="flex items-center gap-[8px] font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#4a5565]">
+                      <span>유동성 자산</span>
+                      <span className="text-[13px] text-[#6a7282]">(7.0%)</span>
+                    </dt>
+                    <dd className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#101828]">
+                      56,458,320,000 원
+                    </dd>
+                  </div>
+
+                  {/* 총 부채 */}
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <dt className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#1e2939]">
+                      총 부채 (Total Liabilities)
+                    </dt>
+                    <dd className="font-['Pretendard_GOV',sans-serif] font-semibold text-[14px] leading-[24px] text-[#e7000b]">
+                      -0 원
+                    </dd>
+                  </div>
+
+                  {/* 순자산총액 */}
+                  <div className="flex items-center justify-between rounded-[10px] border border-[#b9f8cf] bg-green-50 px-4 py-3">
+                    <dt className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#101828]">
+                      순자산총액 (Net Asset Value)
+                    </dt>
+                    <dd className="font-['Pretendard_GOV',sans-serif] font-semibold text-[14px] leading-[24px] text-[#00a63e]">
+                      806,000,000,000 원
+                    </dd>
+                  </div>
+
+                  {/* 총 좌수 */}
+                  <div className="flex items-center justify-between pt-1">
+                    <dt className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-[#1e2939]">
+                      총 좌수 (Total Units)
+                    </dt>
+                    <dd className="font-['Pretendard_GOV',sans-serif] font-semibold text-[14px] leading-[24px] text-[#101828]">
+                      788,012,345,678 좌
+                    </dd>
+                  </div>
+                </dl>
+
+                {/* 금일 기준가 배너 */}
+                <div className="mt-6 rounded-[14px] bg-gradient-to-r from-[#00a63e] to-[#008236] p-8 text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                  <div className="flex items-center justify-between">
+                    <p className="font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[24px] text-green-100">
+                      금일 기준가 (09:00 적용)
+                    </p>
+                    <div className="flex items-end gap-[8px] font-['Pretendard_GOV',sans-serif] font-semibold not-italic text-center text-nowrap text-white">
+                      <span className="relative shrink-0 text-[42px] leading-[31px]">1,023.65</span>
+                      <span className="relative shrink-0 text-[16px] leading-[normal]">원/좌</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -89,7 +157,7 @@ export default function NavUpdate() {
 
         {/* 블록체인 업데이트 정보 + NAV 등록 패널은 TokenIssuance 쪽과 동일한 패턴이므로, 간단 카드로 축약 */}
         <div className="grid w-full gap-[32px] md:grid-cols-2">
-          <div className="basis-0 grow rounded-[10px] border border-gray-200 bg-gray-50 p-[25px]">
+          <div className="basis-0 grow rounded-[10px] border border-gray-200 bg-[#f9fafb] p-[25px]">
             <div className="mb-[16px] flex items-center gap-[8px]">
               <div className="relative size-[20px]">
                 <svg className="block size-full" fill="none" viewBox="0 0 20 20">
@@ -111,7 +179,7 @@ export default function NavUpdate() {
                   </g>
                 </svg>
               </div>
-              <p className="font-['Pretendard_GOV:SemiBold',sans-serif] text-[14px] leading-[24px] text-[#364153]">
+              <p className="font-['Pretendard_GOV',sans-serif] font-semibold text-[14px] leading-[24px] text-[#364153]">
                 블록체인 업데이트 정보
               </p>
             </div>
@@ -123,8 +191,8 @@ export default function NavUpdate() {
             </p>
           </div>
 
-          <div className="basis-0 grow rounded-[10px] border border-[#b9f8cf] bg-white p-[26px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
-            <p className="mb-[8px] text-center font-['Pretendard_GOV:SemiBold',sans-serif] text-[16px] leading-[24px] text-[#1e2939]">
+          <div className="basis-0 grow rounded-[10px] border border-[#b9f8cf] bg-green-50 p-[26px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+            <p className="mb-[8px] text-center font-['Pretendard_GOV',sans-serif] font-semibold text-[16px] leading-[24px] text-[#1e2939]">
               블록체인 등록 준비 완료
             </p>
             <p className="mb-[16px] text-center font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[20px] text-[#4a5565]">

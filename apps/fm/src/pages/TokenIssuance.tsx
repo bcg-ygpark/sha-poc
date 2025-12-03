@@ -32,7 +32,7 @@ function Text2() {
   return (
     <div className="h-[24px] relative shrink-0 w-[193.344px]" data-name="Text">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[24px] relative w-[193.344px]">
-        <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#00a63e] text-nowrap top-[-0.5px] whitespace-pre">2025.11.17 09:00 발행 예정</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-0 not-italic text-[#00a63e] text-nowrap top-[-0.5px] whitespace-pre">2025.11.17 09:00 발행 예정</p>
       </div>
     </div>
   );
@@ -52,7 +52,7 @@ function Container() {
 function Heading2() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#424242] text-nowrap top-[-0.5px] whitespace-pre">발행 예정 건수</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-0 not-italic text-[#424242] text-nowrap top-[-0.5px] whitespace-pre">발행 예정 건수</p>
     </div>
   );
 }
@@ -60,7 +60,7 @@ function Heading2() {
 function Text3() {
   return (
     <div className="absolute h-[40px] left-0 top-0 w-[20.742px]" data-name="Text">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[40px] left-0 not-italic text-[#00a63e] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">3</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[40px] left-0 not-italic text-[#00a63e] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">3</p>
     </div>
   );
 }
@@ -103,7 +103,7 @@ function Container2() {
 function Heading4() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#424242] text-nowrap top-[-0.5px] whitespace-pre">발행 예정 토큰</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-0 not-italic text-[#424242] text-nowrap top-[-0.5px] whitespace-pre">발행 예정 토큰</p>
     </div>
   );
 }
@@ -111,7 +111,7 @@ function Heading4() {
 function Text5() {
   return (
     <div className="absolute h-[40px] left-0 top-0 w-[238.539px]" data-name="Text">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[40px] left-0 not-italic text-[#00a63e] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">6,500,000,000</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[40px] left-0 not-italic text-[#00a63e] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">6,500,000,000</p>
     </div>
   );
 }
@@ -145,7 +145,7 @@ function Container4() {
 function Heading5() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 3">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#424242] text-nowrap top-[-0.5px] whitespace-pre">총 매입 금액</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-0 not-italic text-[#424242] text-nowrap top-[-0.5px] whitespace-pre">총 매입 금액</p>
     </div>
   );
 }
@@ -153,7 +153,7 @@ function Heading5() {
 function Text7() {
   return (
     <div className="absolute h-[40px] left-0 top-0 w-[238.539px]" data-name="Text">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[40px] left-0 not-italic text-[#00a63e] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">6,500,000,000</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[40px] left-0 not-italic text-[#00a63e] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">6,500,000,000</p>
     </div>
   );
 }
@@ -355,7 +355,7 @@ function DataCell3() {
 function DataCell4() {
   return (
     <div className="absolute h-[69px] left-[893.22px] top-0 w-[237.633px]" data-name="Data Cell">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-[213.71px] not-italic text-[#00a63e] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">1,000,000,000</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-[213.71px] not-italic text-[#00a63e] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">1,000,000,000</p>
     </div>
   );
 }
@@ -428,7 +428,7 @@ function DataCell9() {
 function DataCell10() {
   return (
     <div className="absolute h-[69px] left-[893.22px] top-0 w-[237.633px]" data-name="Data Cell">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-[213.71px] not-italic text-[#00a63e] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">5,000,000,000</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-[213.71px] not-italic text-[#00a63e] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">5,000,000,000</p>
     </div>
   );
 }
@@ -501,7 +501,7 @@ function DataCell15() {
 function DataCell16() {
   return (
     <div className="absolute h-[69px] left-[893.22px] top-0 w-[237.633px]" data-name="Data Cell">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-[213.71px] not-italic text-[#00a63e] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">500,000,000</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-[213.71px] not-italic text-[#00a63e] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">500,000,000</p>
     </div>
   );
 }
@@ -591,7 +591,7 @@ function Heading3() {
   return (
     <div className="h-[24px] relative shrink-0 w-[147.5px]" data-name="Heading 3">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[24px] relative w-[147.5px]">
-        <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[#364153] text-nowrap top-[-0.5px] whitespace-pre">스마트 컨트랙트 정보</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-0 not-italic text-[#364153] text-nowrap top-[-0.5px] whitespace-pre">스마트 컨트랙트 정보</p>
       </div>
     </div>
   );
@@ -670,7 +670,7 @@ function Container15() {
 function Heading7() {
   return (
     <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 4">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-[113.11px] not-italic text-[#1e2939] text-center text-nowrap top-[-0.5px] translate-x-[-50%] whitespace-pre">블록체인 발행 준비 완료</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-[113.11px] not-italic text-[#1e2939] text-center text-nowrap top-[-0.5px] translate-x-[-50%] whitespace-pre">블록체인 발행 준비 완료</p>
     </div>
   );
 }

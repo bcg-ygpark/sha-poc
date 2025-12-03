@@ -111,7 +111,7 @@ function Heading2() {
 function Text4() {
   return (
     <div className="absolute h-[54px] left-0 top-0 w-[41.484px]" data-name="Text">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[54px] left-0 not-italic text-[#155dfc] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">42</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[54px] left-0 not-italic text-[#155dfc] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">42</p>
     </div>
   );
 }
@@ -184,7 +184,7 @@ function Heading3() {
 function Text7() {
   return (
     <div className="absolute h-[54px] left-0 top-0 w-[259.281px]" data-name="Text">
-      <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[54px] left-0 not-italic text-[#155dfc] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">42,158,000,000</p>
+      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[54px] left-0 not-italic text-[#155dfc] text-[36px] text-nowrap top-[-0.5px] whitespace-pre">42,158,000,000</p>
     </div>
   );
 }
@@ -1350,7 +1350,7 @@ function Text25() {
   return (
     <div className="h-[24px] relative shrink-0 w-[59.922px]" data-name="Text">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[24px] relative w-[59.922px]">
-        <p className="absolute font-['Pretendard_GOV:SemiBold',sans-serif] leading-[24px] left-0 not-italic text-[16px] text-nowrap text-white top-[-0.5px] whitespace-pre">청약 관리</p>
+        <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-0 not-italic text-[16px] text-nowrap text-white top-[-0.5px] whitespace-pre">청약 관리</p>
       </div>
     </div>
   );

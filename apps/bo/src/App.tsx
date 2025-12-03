@@ -129,7 +129,7 @@ export default function App() {
       </div>
 
       {/* Top Header */}
-      <div className="fixed left-0 right-0 top-0 z-10 flex h-[64px] items-center justify-between bg-[#155dfc] px-[32px]">
+      <div className="fixed left-0 right-0 top-0 z-10 flex h-[64px] items-center justify-between bg-[#004094] px-[32px]">
         <div className="flex items-center gap-[12px]">
           <div className="flex size-[36px] items-center justify-center rounded-[8px] bg-white">
             <span className="text-[#155dfc]">신</span>

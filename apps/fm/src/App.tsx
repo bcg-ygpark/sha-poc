@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@digital-wallet/ui";
 import TokenIssuance from "./pages/TokenIssuance";
 import NavUpdate from "./pages/NavUpdate";
 import svgPaths from "./imports/svg-fodi3oah1h";
@@ -12,7 +11,7 @@ export default function App() {
   return (
     <div className="bg-gray-100 relative size-full">
       {/* Header */}
-      <div className="fixed left-0 right-0 top-0 z-10 flex h-[64px] items-center justify-between bg-[#008236] px-[32px]">
+      <div className="fixed left-0 right-0 top-0 z-10 flex h-[64px] items-center justify-between bg-[#008236] px-[32px] border-b border-[#005b25] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
         <div className="flex items-center gap-[12px]">
           <div className="flex size-[32px] items-center justify-center rounded-[4px] bg-white">
             <span className="text-[#00a63e] font-semibold">신</span>
@@ -20,18 +19,16 @@ export default function App() {
           <p className="text-white text-[18px] font-semibold">신한자산운용 펀드 관리 시스템</p>
         </div>
         <div className="flex items-center gap-[16px]">
-          <div className="flex items-center gap-[8px] rounded-[10px] bg-[#008236] border border-[#00a63e] px-[16px] py-[8px]">
+          <div className="flex h-[40px] items-center gap-[8px] rounded-[10px] bg-[#008236] px-[16px]">
             <span className="text-[#b9f8cf] text-[14px]">펀드매니저:</span>
             <span className="text-white text-[14px] font-medium">최운용</span>
           </div>
-          <Button
-            variant="primary"
-            size="sm"
-            customColor="#ffffff"
-            className="rounded-[10px] px-[20px] py-[8px] text-[#00a63e] hover:bg-gray-100"
+          <button
+            type="button"
+            className="h-[40px] rounded-[10px] bg-white px-[20px] text-[14px] font-medium text-[#00a63e] transition-colors hover:bg-gray-100"
           >
             로그아웃
-          </Button>
+          </button>
         </div>
       </div>
 
