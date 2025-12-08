@@ -4,11 +4,13 @@ import ShaPoC02 from "./imports/ShaPoC02매입완료";
 import ShaPoC03 from "./imports/ShaPoC03보유자산";
 import ShaPoC04 from "./imports/ShaPoC04환매신청개인";
 import ShaPoC06 from "./imports/ShaPoC06환매완료개인";
+import { MyWalletProvider } from "./contexts/WalletContext";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'purchase' | 'complete' | 'assets' | 'redeem' | 'redeemComplete'>('purchase');
 
   return (
+    <MyWalletProvider>
     <div className="w-full h-screen flex items-center justify-center bg-[#f6f6f9]">
       <div className="w-[360px] h-full max-h-[844px] bg-white shadow-xl overflow-auto relative">
         {currentScreen === 'purchase' ? (
@@ -36,5 +38,6 @@ export default function App() {
         )}
       </div>
     </div>
+    </MyWalletProvider>
   );
 }

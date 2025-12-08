@@ -1,6 +1,7 @@
 import svgPaths from "./svg-9r4g0t4yl5";
 import { imgIcon } from "./svg-1da4c";
 import { useState } from "react";
+import { useMyWallet } from "../contexts/WalletContext";
 
 function Frame() {
   return (
@@ -82,7 +83,7 @@ function Container() {
     <div className="bg-white relative shrink-0 w-full" data-name="container">
       <div className="flex flex-col justify-center size-full">
         <div className="box-border content-stretch flex flex-col gap-[8px] items-start justify-center px-[20px] py-0 relative w-full">
-          <p className="font-['Spoqa_Han_Sans_Neo:Bold',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#333950] text-[18px] text-center text-nowrap whitespace-pre">신한개인용MMF제2호</p>
+          <p className="font-['Spoqa_Han_Sans_Neo:Bold',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#333950] text-[18px] text-center text-nowrap whitespace-pre">신한개인용MMF제2호???</p>
           <p className="font-['Spoqa_Han_Sans_Neo:Regular',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#777e8c] text-[13px] text-center text-nowrap whitespace-pre">기준가: 1,023.65원/좌 (2025.11.13)</p>
           <Frame25 />
         </div>
@@ -198,6 +199,7 @@ function Group3() {
 }
 
 function Frame3() {
+
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-[321px]">
       <p className="font-['Spoqa_Han_Sans_Neo:Bold',sans-serif] leading-[20px] not-italic relative shrink-0 text-[#111111] text-[15px] text-nowrap whitespace-pre">매입 금액</p>
