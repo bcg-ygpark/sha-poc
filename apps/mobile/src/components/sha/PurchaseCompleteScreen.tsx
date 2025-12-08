@@ -2,10 +2,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@digital-wallet/ui";
 import MobileStickyFooter from "../layout/MobileStickyFooter";
 import MobilePageHeader from "../ui/MobilePageHeader";
+import { useMyWallet } from "../../contexts/WalletContext";
+import {SECUCHAIN_BRIDGE_URL} from "../../imports/myWallet";
+import { Wallet } from "ethers";
 
 export default function PurchaseCompleteScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { wallet, isInitialized } = useMyWallet();
 
   const state = location.state as { amount?: number } | null;
   const amount = typeof state?.amount === "number" && !Number.isNaN(state.amount) ? state.amount : 1_000_000_000;
@@ -13,6 +17,10 @@ export default function PurchaseCompleteScreen() {
 
   const handleNavigateAssets = () => {
     navigate("/assets");
+  };
+
+  const handleOpenExplorer = (txid: string) => {
+    window.open(`${SECUCHAIN_BRIDGE_URL}tx/${txid}`, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -63,8 +71,11 @@ export default function PurchaseCompleteScreen() {
         {/* 블록체인 정보 */}
         <section className="space-y-3 rounded-[12px] border border-[#ebedf5] bg-white px-4 py-4 shadow-sm">
           <h2 className="text-[14px] font-bold text-[#111111]">블록체인 정보</h2>
-          <div className="rounded-[8px] bg-[#f7f7f7] px-4 py-3 text-[12px] text-[#77738c] break-all">
-            0x742d35Cc1234567890abcdef1234567890AbCdEf
+          <div
+            className="rounded-[8px] bg-[#f7f7f7] px-4 py-3 text-[12px] text-[#77738c] break-all cursor-pointer hover:bg-[#eef0f2] transition-colors"
+            onClick={() => handleOpenExplorer(wallet.purchaseHash)}
+          >
+            {wallet.purchaseHash}
           </div>
         </section>
       </main>

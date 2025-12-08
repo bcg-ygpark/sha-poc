@@ -10,6 +10,10 @@ import PurchaseCompleteScreen from "./components/sha/PurchaseCompleteScreen";
 import AssetsScreen from "./components/sha/AssetsScreen";
 import RedeemScreen from "./components/sha/RedeemScreen";
 import RedeemCompleteScreen from "./components/sha/RedeemCompleteScreen";
+
+import { MyWalletProvider } from "./contexts/WalletContext";
+
+
 function ScrollToTop() {
   const { pathname } = useLocation();
   const viewportContext = useMobileViewportContext();
@@ -58,18 +62,28 @@ function WorkspaceLayout() {
   );
 }
 
+function MyWalletLayout() {
+  return (
+    <MyWalletProvider>
+      <Outlet />
+    </MyWalletProvider>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<WorkspaceLayout />}>
-          <Route path="/" element={<Navigate to="/purchase" replace />} />
-          <Route path="/purchase" element={<PurchaseScreen />} />
-          <Route path="/purchase/complete" element={<PurchaseCompleteScreen />} />
-          <Route path="/assets" element={<AssetsScreen />} />
-          <Route path="/redeem" element={<RedeemScreen />} />
-          <Route path="/redeem/complete" element={<RedeemCompleteScreen />} />
-          <Route path="*" element={<Navigate to="/purchase" replace />} />
+          <Route element={<MyWalletLayout />}>
+            <Route path="/" element={<Navigate to="/purchase" replace />} />
+            <Route path="/purchase" element={<PurchaseScreen />} />
+            <Route path="/purchase/complete" element={<PurchaseCompleteScreen />} />
+            <Route path="/assets" element={<AssetsScreen />} />
+            <Route path="/redeem" element={<RedeemScreen />} />
+            <Route path="/redeem/complete" element={<RedeemCompleteScreen />} />
+            <Route path="*" element={<Navigate to="/purchase" replace />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

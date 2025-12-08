@@ -1,25 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input } from "@digital-wallet/ui";
 import MobileStickyFooter from "../layout/MobileStickyFooter";
 import MobilePageHeader from "../ui/MobilePageHeader";
+import { useMyWallet } from "../../contexts/WalletContext";
+import { SKRW_CONTRACT_ADDRESS} from "../../imports/myWallet";
 
-export default function PurchaseScreen() {
+
+export default function PurchaseScreen()  {
   const navigate = useNavigate();
-  const [amount, setAmount] = useState("1000000000");
+  const { wallet, isInitialized } = useMyWallet();
+  const [amount, setAmount] = useState("0");
   const [mode, setMode] = useState<"direct" | "max">("direct");
 
   const numericAmount = Number(amount || "0") || 0;
   const formattedAmount = numericAmount.toLocaleString("ko-KR");
 
-  const handleComplete = () => {
+  useEffect(() => {
+    if (isInitialized) {
+      setAmount(wallet.skrw_balance.toString());
+    }
+  }, [isInitialized, wallet.skrw_balance]); 
+
+  const handleComplete = async () => {
+
+    await wallet.resync();
+
+    if(numericAmount > wallet.skrw_balance ) {
+      alert('잔고가 부족합니다');
+      return;
+    }
+
+    if(numericAmount <= 0) {
+      alert('금액을 입력해주세요');
+      return;
+    }
+
+    const tr = await wallet.purchase(amount);
+    tr.blockHash;
+    
+
     navigate("/purchase/complete", { state: { amount: numericAmount } });
+
   };
 
   const handleQuickAmount = (value: string) => {
     setAmount(value);
     setMode("direct");
   };
+
+  const handleMaxAmount = (value: string) => {
+    setAmount(wallet.skrw_balance.toString());
+    setMode("max");
+  };
+ 
 
   return (
     <div className="flex min-h-full w-full flex-col bg-white">
@@ -131,7 +165,7 @@ export default function PurchaseScreen() {
               type="button"
               className="h-9 rounded-[6px] bg-[#f4f6f9] text-[12px] text-[#242424]"
               onClick={() => {
-                setMode("max");
+                handleMaxAmount("max");
               }}
             >
               최대
