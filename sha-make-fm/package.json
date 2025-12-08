@@ -1,6 +1,6 @@
 
   {
-      "name": "SHA-make-desktop2",
+      "name": "@template/fm",
       "version": "0.1.0",
       "private": true,
       "dependencies": {
