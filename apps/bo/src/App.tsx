@@ -1,9 +1,19 @@
 import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Outlet } from "react-router-dom";
 import { Button } from "@digital-wallet/ui";
 import Subscription from "./pages/Subscription";
 import Redemption from "./pages/Redemption";
 import Monitoring from "./pages/Monitoring";
 import svgPaths from "./imports/svg-o3ey7j7i6q";
+import { MyWalletProvider } from "./contexts/WalletContext";
+
+function MyWalletLayout() {
+  return (
+    <MyWalletProvider>
+      <Outlet />
+    </MyWalletProvider>
+  );
+}
 
 type Page = "subscription" | "redemption" | "monitoring";
 
@@ -11,7 +21,8 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("subscription");
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <MyWalletProvider>
+      <div className="min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="fixed left-0 top-[64px] h-[calc(100vh-64px)] w-[336px] bg-[#1e2939] p-[24px]">
         <div className="space-y-[8px]">
@@ -152,7 +163,8 @@ export default function App() {
         {currentPage === "redemption" && <Redemption />}
         {currentPage === "monitoring" && <Monitoring />}
       </div>
-    </div>
+      </div>
+    </MyWalletProvider>
   );
 }
 

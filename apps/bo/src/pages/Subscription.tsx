@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import svgPaths from "../imports/svg-o3ey7j7i6q";
 import { Button, Input } from "@digital-wallet/ui";
+import { useMyWallet } from "../contexts/WalletContext"
 
 interface SubscriptionData {
   id: string;
@@ -9,22 +10,121 @@ interface SubscriptionData {
   customerName: string;
   amount: number;
   status: "완료" | "대기";
+  txid: string;
 }
 
-const mockData: SubscriptionData[] = [
-  { id: "1", tradeNumber: "SHA20251123004Z", tradeTime: "16:25:33", customerName: "김차산", amount: 1000000000, status: "완료" },
-  { id: "2", tradeNumber: "SHA20251123004I", tradeTime: "16:18:15", customerName: "이두사", amount: 500000000, status: "대기" },
-  { id: "3", tradeNumber: "SHA20251123004D", tradeTime: "16:05:47", customerName: "박세무", amount: 2000000000, status: "완료" },
-  { id: "4", tradeNumber: "SHA20251123003P", tradeTime: "15:52:22", customerName: "최부자", amount: 1500000000, status: "완료" },
-  { id: "5", tradeNumber: "SHA20251123003S", tradeTime: "15:38:09", customerName: "정금융", amount: 300000000, status: "대기" },
-  { id: "6", tradeNumber: "SHA20251123003L", tradeTime: "15:20:44", customerName: "강투자", amount: 800000000, status: "완료" },
-  { id: "7", tradeNumber: "SHA20251123002W", tradeTime: "14:55:18", customerName: "오청약", amount: 1200000000, status: "완료" },
-  { id: "8", tradeNumber: "SHA20251123002M", tradeTime: "14:32:05", customerName: "송자산", amount: 600000000, status: "완료" },
+const initialMockData: SubscriptionData[] = [
+  { id: "1", tradeNumber: "SHA20251123004Z", tradeTime: "16:25:33", customerName: "김자산", amount: 1000000000, status: "완료", txid:"1" },
+  { id: "2", tradeNumber: "SHA20251123004I", tradeTime: "16:18:15", customerName: "이두사", amount: 500000000, status: "대기" , txid:"2"},
+  { id: "3", tradeNumber: "SHA20251123004D", tradeTime: "16:05:47", customerName: "박세무", amount: 2000000000, status: "완료", txid:"3" },
+  { id: "9", tradeNumber: "SHA20251123004D", tradeTime: "16:05:47", customerName: "박세무", amount: 2000000000, status: "완료", txid:"4" },
+  { id: "10", tradeNumber: "SHA20251123004D", tradeTime: "16:05:47", customerName: "박세무", amount: 2000000000, status: "완료", txid:"5" },
+  { id: "4", tradeNumber: "SHA20251123003P", tradeTime: "15:52:22", customerName: "최부자", amount: 1500000000, status: "완료", txid:"6" },
+  { id: "5", tradeNumber: "SHA20251123003S", tradeTime: "15:38:09", customerName: "정금융", amount: 300000000, status: "대기", txid:"7" },
+  { id: "6", tradeNumber: "SHA20251123003L", tradeTime: "15:20:44", customerName: "강투자", amount: 800000000, status: "완료", txid:"8" },
+  { id: "7", tradeNumber: "SHA20251123002W", tradeTime: "14:55:18", customerName: "오청약", amount: 1200000000, status: "완료", txid:"9" },
+  { id: "8", tradeNumber: "SHA20251123002M", tradeTime: "14:32:05", customerName: "송자산", amount: 600000000, status: "완료", txid:"10" },
 ];
 
 export default function Subscription() {
   const [filter, setFilter] = useState<"전체" | "대기">("전체");
   const [searchQuery, setSearchQuery] = useState("");
+  const [mockData, setMockData] = useState<SubscriptionData[]>(initialMockData);
+  const { wallet, isInitialized } = useMyWallet();
+
+  // recentPurchases를 SubscriptionData로 변환하는 함수
+  const convertToSubscriptionData = (index: number): SubscriptionData | null => {
+    const purchase = wallet.recentPurchases[index];
+    if (!purchase) return null;
+
+    // timestamp를 HH:MM:SS 형식으로 변환
+    const date = new Date(purchase.timestamp * 1000);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const tradeTime = `${hours}:${minutes}:${seconds}`;
+
+    // amount를 숫자로 변환 (소수점 제거)
+    const amountNum = Math.floor(parseFloat(purchase.amount));
+
+    return {
+      id: `purchase-${purchase.txid}`,
+      tradeNumber: "SHA20251123005X",
+      tradeTime: tradeTime,
+      customerName: "김자산",
+      amount: amountNum,
+      status: "완료",
+      txid: purchase.txid,
+    };
+  };
+
+  // recentPurchases 변경 시 mockData에 추가
+  useEffect(() => {
+    if (isInitialized && wallet.recentPurchases.length > 0) {
+      console.log('[Subscription] Recent Purchases:', wallet.recentPurchases);
+
+      const newData = convertToSubscriptionData(0);
+      console.log('[Subscription] Converted newData:', newData);
+
+      if (newData) {
+        setMockData(prevData => {
+          console.log('[Subscription] Current mockData:', prevData);
+          // 이미 같은 txid가 있는지 확인
+          const exists = prevData.some(item => item.txid === newData.txid);
+          console.log('[Subscription] Already exists?', exists, 'newData.id:', newData.id);
+
+          if (!exists) {
+            console.log('[Subscription] Adding new data to list');
+            return [newData, ...prevData];
+          }
+          console.log('[Subscription] Data already exists, skipping');
+          return prevData;
+        });
+      } else {
+        console.log('[Subscription] newData is null, skipping');
+      }
+    }
+  }, [isInitialized, wallet.recentPurchases[0]?.txid]);
+
+  // 5초마다 fetchRecentPurchases 호출
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    // 초기 실행
+    wallet.fetchRecentPurchases();
+
+    // 5초마다 실행
+    const intervalId = setInterval(() => {
+      wallet.fetchRecentPurchases();
+
+      const newData = convertToSubscriptionData(0);
+      console.log('[Subscription] Converted newData:', newData);
+
+      if (newData) {
+        setMockData(prevData => {
+          console.log('[Subscription] Current mockData:', prevData);
+          // 이미 같은 txid가 있는지 확인
+          const exists = prevData.some(item => item.txid === newData.txid);
+          console.log('[Subscription] Already exists?', exists, 'newData.id:', newData.id);
+
+          if (!exists) {
+            console.log('[Subscription] Adding new data to list');
+            return [newData, ...prevData];
+          }
+          console.log('[Subscription] Data already exists, skipping');
+          return prevData;
+        });
+      } else {
+        console.log('[Subscription] newData is null, skipping');
+      }
+      
+    }, 5000);
+
+    // cleanup
+    return () => clearInterval(intervalId);
+  }, [isInitialized, wallet]); 
+
+
 
   const filteredData = mockData.filter((item) => {
     const matchesFilter = filter === "전체" || item.status === filter;

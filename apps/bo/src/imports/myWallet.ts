@@ -35,6 +35,19 @@ const ERC1400_ABI = [
   "function decimals() view returns (uint8)",
 ];
 
+const MMF_ABI = [
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function totalSupply() view returns (uint256)",
+  "function currentNAV() view returns (uint256)",
+  "function hasRole(bytes32 role, address account) view returns (bool)",
+  "function paused() view returns (bool)",
+  "function purchaseWithDT(address buyer, uint256 dtAmount) returns (uint256)",
+  "function balanceOf(address account) view returns (uint256)",
+  "function lockupUntil(address) view returns (uint256)",
+  "function getPendingPurchaseCount(address user) view returns (uint256)",
+];
+
 export const SOL_ADDRESS = "0x8DFeB78ecEe391149b1c2739cEd0f6992D0a5663";
 const PRIVATE_KEY =
   "0x47c496fe62e38aebcf4c5298cdae6889efed27b308fb473311d4a209e512f20e";
@@ -43,6 +56,14 @@ export const BROKER_ADDRESS = "0xf17f52151EbEF6C7334FAD080c5704D77216b732"; // �
 
 const PULSE_PRIVATE_KEY =
   "0xcd2336d7c471a0f2f1da77e91bcaf71e96e40481415bdb062152b4d045e1702c";
+
+export interface PurchaseTransaction {
+  from: string;
+  txid: string;
+  amount: string;
+  timestamp: number; // Unix timestamp (seconds)
+  blockNumber: number;
+}
 
 export class MyWallet {
   private wallet: Wallet;
@@ -56,6 +77,8 @@ export class MyWallet {
 
   purchaseHash: string = "";
   txHash2: string = "";
+
+  recentPurchases: PurchaseTransaction[] = [];
 
   /**
    * @param privateKey 지갑을 생성하기 위한 개인키
@@ -111,6 +134,8 @@ export class MyWallet {
     this.skrw_balance = Number(
       await this.getERC20Balance(SKRW_CONTRACT_ADDRESS, this.provider)
     );
+
+    await this.fetchRecentPurchases();
   }
 
   async resync(): Promise<void> {
@@ -171,6 +196,66 @@ export class MyWallet {
     const amountToSend = ethers.parseUnits(amount, decimals);
     const tx = await contract.transfer(toAddress, amountToSend);
     return tx;
+  }
+
+  /**
+   * SKRW에서 BROKER_ADDRESS로 전송된 최근 5개의 트랜잭션을 검색합니다.
+   */
+  async fetchRecentPurchases(): Promise<void> {
+    try {
+      const contract = new ethers.Contract(
+        SKRW_CONTRACT_ADDRESS,
+        [
+          "event Transfer(address indexed from, address indexed to, uint256 value)",
+          "function decimals() view returns (uint8)",
+        ],
+        this.provider
+      );
+
+      // 최근 블록부터 검색 (최근 10000 블록 범위)
+      const currentBlock = await this.provider.getBlockNumber();
+      const fromBlock = Math.max(0, currentBlock - 100);
+
+      // Transfer 이벤트 필터: to가 BROKER_ADDRESS인 것만
+      const filter = contract.filters.Transfer(null, BROKER_ADDRESS);
+      const events = await contract.queryFilter(
+        filter,
+        fromBlock,
+        currentBlock
+      );
+
+      // 최근 5개만 가져오기 (역순으로 정렬)
+      const recentEvents = events.slice(-5).reverse();
+
+      // decimals 가져오기
+      const decimals = await contract.decimals();
+
+      // PurchaseTransaction 배열로 변환 (블록 정보와 함께)
+      this.recentPurchases = await Promise.all(
+        recentEvents.map(async (event) => {
+          if (!("args" in event)) {
+            throw new Error("Event does not have args");
+          }
+          const args = event.args;
+
+          // 블록 정보 가져오기
+          const block = await this.provider.getBlock(event.blockNumber);
+
+          return {
+            from: args[0] as string, // from address
+            txid: event.transactionHash,
+            amount: ethers.formatUnits(args[2], decimals), // value를 사람이 읽을 수 있는 형식으로
+            timestamp: block?.timestamp || 0,
+            blockNumber: event.blockNumber,
+          };
+        })
+      );
+
+      console.log("[myWallet] Recent purchases fetched:", this.recentPurchases);
+    } catch (error) {
+      console.error("[myWallet] Failed to fetch recent purchases:", error);
+      this.recentPurchases = [];
+    }
   }
 }
 

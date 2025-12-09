@@ -2,6 +2,7 @@ import { useState } from "react";
 import TokenIssuance from "./pages/TokenIssuance";
 import NavUpdate from "./pages/NavUpdate";
 import svgPaths from "./imports/svg-fodi3oah1h";
+import { MyWalletProvider } from "./contexts/WalletContext";
 
 type Page = "nav" | "token";
 
@@ -9,6 +10,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("nav");
 
   return (
+    <MyWalletProvider>
     <div className="bg-gray-100 relative size-full">
       {/* Header */}
       <div className="fixed left-0 right-0 top-0 z-10 flex h-[64px] items-center justify-between bg-[#008236] px-[32px] border-b border-[#005b25] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
@@ -99,7 +101,9 @@ export default function App() {
         {currentPage === "token" && <TokenIssuance />}
       </main>
     </div>
+    </MyWalletProvider>
   );
+  
 }
 
 

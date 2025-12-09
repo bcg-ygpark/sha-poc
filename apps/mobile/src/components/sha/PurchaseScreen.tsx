@@ -20,7 +20,24 @@ export default function PurchaseScreen()  {
     if (isInitialized) {
       setAmount(wallet.skrw_balance.toString());
     }
-  }, [isInitialized, wallet.skrw_balance]); 
+  }, [isInitialized, wallet.skrw_balance]);
+
+  // 5초마다 지갑 잔액 체크
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const intervalId = setInterval(async () => {
+      await wallet.resync();
+      console.log('[PurchaseScreen] Wallet balance updated:', wallet.skrw_balance);
+
+      // amount가 잔액보다 큰지 체크
+      if (numericAmount > wallet.skrw_balance) {
+        console.log('[PurchaseScreen] Warning: Amount exceeds balance');
+      }
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [isInitialized, wallet, numericAmount]);
 
   const handleComplete = async () => {
 
