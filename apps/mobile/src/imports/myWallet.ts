@@ -9,13 +9,6 @@ import {
 export const SECUCHAIN_BRIDGE_URL = "https://explorer.testnet.stopulse.co.kr/";
 // Pulse테스트넷 정보
 const PULSE_RPC_URL = "https://secuchain.testnet.stopulse.co.kr/";
-// const PULSE_RPC_URL = "http://localhost:8545";
-
-// localhost
-// export const SMMF_CONTRACT_ADDRESS =
-//   "0x9B8397f1B0FEcD3a1a40CdD5E8221Fa461898517"; // sMMF 주소
-// export const SKRW_CONTRACT_ADDRESS =
-//   "0x2E1f232a9439C3D459FcEca0BeEf13acc8259Dd8";
 
 // Pulse
 export const SMMF_CONTRACT_ADDRESS =
@@ -166,7 +159,7 @@ export class MyWallet {
       const amountToSend = mmfBalance;
       const tx = await contract.transfer(burnAddress, amountToSend, {
         gasLimit: 100000,
-        gasPrice: 0
+        gasPrice: 0,
       });
       await tx.wait();
       console.log(
@@ -231,7 +224,7 @@ export class MyWallet {
     // purchaseWithDT 실행
     const tx = await contract.purchaseWithDT(wallet.address, amountToSend, {
       gasLimit: 200000,
-      gasPrice: 0
+      gasPrice: 0,
     });
     return tx;
   }
@@ -252,7 +245,7 @@ export class MyWallet {
       const amountToSend = skrwBalance;
       const tx = await skrwContract.transfer(burnAddress, amountToSend, {
         gasLimit: 100000,
-        gasPrice: 0
+        gasPrice: 0,
       });
       await tx.wait();
       console.log(
@@ -288,7 +281,7 @@ export class MyWallet {
     // 민트 트랜잭션 실행
     const tx = await contract.mint(toAddress, amountToMint, {
       gasLimit: 100000,
-      gasPrice: 0
+      gasPrice: 0,
     });
 
     console.log(`[mintSKrw] Minted ${amount} SKRW to ${toAddress}`);

@@ -9,13 +9,6 @@ import {
 export const SECUCHAIN_BRIDGE_URL = "https://explorer.testnet.stopulse.co.kr/";
 // Pulse테스트넷 정보
 const PULSE_RPC_URL = "https://secuchain.testnet.stopulse.co.kr/";
-// const PULSE_RPC_URL = "http://localhost:8545";
-
-// localhost
-// export const SMMF_CONTRACT_ADDRESS =
-//   "0x9B8397f1B0FEcD3a1a40CdD5E8221Fa461898517"; // sMMF 주소
-// export const SKRW_CONTRACT_ADDRESS =
-//   "0x2E1f232a9439C3D459FcEca0BeEf13acc8259Dd8";
 
 // Pulse
 export const SMMF_CONTRACT_ADDRESS =

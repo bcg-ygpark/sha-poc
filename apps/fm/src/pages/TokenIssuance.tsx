@@ -44,6 +44,11 @@ export default function TokenIssuance() {
     window.open(`${SECUCHAIN_BRIDGE_URL}${type}/${value}`, "_blank", "noopener,noreferrer");
   };
 
+  const handleTokenIssuance = async () => {
+    
+    
+    
+  }
   // recentPurchases를 IssuanceData로 변환하는 함수
   const convertToIssuanceData = (purchase: PurchaseTransaction, userName: string, userType: string): IssuanceData | null => {
     if (!purchase) return null;
@@ -392,7 +397,10 @@ export default function TokenIssuance() {
                     발행 대기 목록을 블록체인에 기록합니다
                   </p>
                   <div className="flex justify-center">
-                    <div className="flex h-[54px] w-[320px] items-center justify-center gap-[8px] rounded-[10px] bg-[#00a63e] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                    <div
+                      className="flex h-[54px] w-[320px] items-center justify-center gap-[8px] rounded-[10px] bg-[#00a63e] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] cursor-pointer hover:bg-[#009436] transition-colors"
+                      onClick={handleTokenIssuance}
+                    >
                       <span className="text-[15px] font-medium">09:00 토큰 발행 실행 ({issuanceCount}건)</span>
                     </div>
                   </div>
