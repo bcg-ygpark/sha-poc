@@ -1,13 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TokenIssuance from "./pages/TokenIssuance";
 import NavUpdate from "./pages/NavUpdate";
 import svgPaths from "./imports/svg-fodi3oah1h";
-import { MyWalletProvider } from "./contexts/WalletContext";
+import { MyWalletProvider, useMyWallet } from "./contexts/WalletContext";
+
 
 type Page = "nav" | "token";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("nav");
+
+
+  const handleInit = (txid: string) => {
+    
+  };
 
   return (
     <MyWalletProvider>

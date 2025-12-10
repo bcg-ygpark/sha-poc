@@ -191,6 +191,7 @@ export default function NavUpdate() {
             </p>
           </div>
 
+          {/* Button NAV등록*/}
           <div className="basis-0 grow rounded-[10px] border border-[#b9f8cf] bg-green-50 p-[26px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
             <p className="mb-[8px] text-center font-['Pretendard_GOV',sans-serif] font-semibold text-[16px] leading-[24px] text-[#1e2939]">
               블록체인 등록 준비 완료

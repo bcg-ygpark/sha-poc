@@ -16,6 +16,32 @@ export default function PurchaseScreen()  {
   const numericAmount = Number(amount || "0") || 0;
   const formattedAmount = numericAmount.toLocaleString("ko-KR");
 
+  const handleInit = async () => {
+      const confirmed = confirm('초기화 하시겠습니까?');
+      if (confirmed) {
+        // 초기화 로직 실행
+        await wallet.initAccount();
+        console.log('계좌 초기화 실행됨');
+        alert('계좌 초기화 가 실행되었습니다')
+      } else {
+        // 취소됨
+        console.log('초기화 취소');
+      }
+    };
+
+  const handlePreOrder = async () => {
+      const confirmed = confirm('초기 청약세팅을 진행합니다');
+      if (confirmed) {
+        // 초기화 로직 실행
+        await wallet.initPurchase();
+        console.log('초기 청약세팅 완료');
+        alert('초기 청약세팅이 완료되었습니다.')
+      } else {
+        // 취소됨
+        console.log('초기화 취소');
+      }
+    };
+
   useEffect(() => {
     if (isInitialized) {
       setAmount(wallet.skrw_balance.toString());
@@ -28,7 +54,15 @@ export default function PurchaseScreen()  {
 
     const intervalId = setInterval(async () => {
       await wallet.resync();
-      console.log('[PurchaseScreen] Wallet balance updated:', wallet.skrw_balance);
+      console.log('[PurchaseScreen] SKrw balance updated:', wallet.skrw_balance);
+      console.log('[PurchaseScreen] SMmf balance updated:', wallet.smmf_balance);
+
+      console.log('[PurchaseScreen] SKrw balance2 updated:', wallet.skrw_balance2);
+      console.log('[PurchaseScreen] SMmf balance2 updated:', wallet.smmf_balance2);
+
+      console.log('[PurchaseScreen] SKrw balance3 updated:', wallet.skrw_balance3);
+      console.log('[PurchaseScreen] SMmf balance3 updated:', wallet.smmf_balance3);
+      
 
       // amount가 잔액보다 큰지 체크
       if (numericAmount > wallet.skrw_balance) {
@@ -53,9 +87,8 @@ export default function PurchaseScreen()  {
       return;
     }
 
-    const tr = await wallet.purchase(amount);
-    tr.blockHash;
-    
+    const tr = await wallet.purchase(amount, wallet.wallet);
+
 
     navigate("/purchase/complete", { state: { amount: numericAmount } });
 
@@ -74,7 +107,10 @@ export default function PurchaseScreen()  {
 
   return (
     <div className="flex min-h-full w-full flex-col bg-white">
-      <MobilePageHeader title="매입" onBack={() => {}} />
+      <MobilePageHeader title="매입" 
+        onBack={() => {}} 
+        
+        />
 
       <main className="flex-1 px-5 pb-24 pt-4 space-y-6">
         {/* 상품 요약 */}
@@ -87,7 +123,9 @@ export default function PurchaseScreen()  {
               <p className="text-[12px] text-[#77738c]">연 수익률</p>
               <p className="mt-1 text-[14px] font-bold text-[#333950]">2.60%</p>
             </div>
-            <div className="rounded-[12px] bg-[#f4f6f9] px-4 py-3">
+            <div className="rounded-[12px] bg-[#f4f6f9] px-4 py-3"
+            onClick={() => handlePreOrder()}
+            >
               <p className="text-[12px] text-[#77738c]">1개월 수익률</p>
               <p className="mt-1 text-[14px] font-bold text-[#333950]">0.19%</p>
             </div>
@@ -96,7 +134,9 @@ export default function PurchaseScreen()  {
 
         {/* 결제 수단 */}
         <section className="space-y-3">
-          <h2 className="text-[15px] font-bold text-[#111111]">결제 수단</h2>
+          <h2 className="text-[15px] font-bold text-[#111111]"
+            onClick={() => handleInit()}
+          >결제 수단</h2>
           <button
             type="button"
             className="flex h-[42px] w-full items-center justify-between rounded-[6px] border border-[#eeeeee] bg-white px-3"

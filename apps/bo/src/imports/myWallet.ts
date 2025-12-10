@@ -19,7 +19,7 @@ const PULSE_RPC_URL = "https://secuchain.testnet.stopulse.co.kr/";
 
 // Pulse
 export const SMMF_CONTRACT_ADDRESS =
-  "0x7878Ed4aD35d74468bdb56547cfb3719439893e6"; // sMMF 주소
+  "0x8FFe39e8b5aa82B07A2Da8CD02b497A379D82982"; // sMMF 주소
 export const SKRW_CONTRACT_ADDRESS =
   "0xaBba758C39BE3f4751Cf13F562E2dD6955648670";
 
@@ -49,8 +49,22 @@ const MMF_ABI = [
 ];
 
 export const SOL_ADDRESS = "0x8DFeB78ecEe391149b1c2739cEd0f6992D0a5663";
+export const USR_NAME = "개인사용자";
+export const USR_TYPE = "개인";
 const PRIVATE_KEY =
   "0x47c496fe62e38aebcf4c5298cdae6889efed27b308fb473311d4a209e512f20e";
+
+export const USR1_ADDRESS = "0x0158e26744ce0D3Cd07067FED6513463d87e7C34";
+export const USR1_NAME = "기관1";
+export const USR1_TYPE = "법인";
+export const USR1_KEY =
+  "0cfb5d9627d075e69d5fc32e14f35e439c03be2690b441150175ad9330a4b5e7";
+
+export const USR2_ADDRESS = "0xd5309cc4e90A8D09d8E1206D62a09cE2f7ed36f1";
+export const USR2_NAME = "기관2";
+export const USR2_TYPE = "법인";
+export const USR2_KEY =
+  "4ff82f336926b30750e445a66bc41e604c1f7f7f59a03cd9fcc182564955c80f";
 
 export const BROKER_ADDRESS = "0xf17f52151EbEF6C7334FAD080c5704D77216b732"; // 증권사 주소
 

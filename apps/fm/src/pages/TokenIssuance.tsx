@@ -1,6 +1,11 @@
 import svgPaths from "../imports/svg-dk37z7wkss";
 import { useState, useEffect } from "react";
 import { useMyWallet } from "../contexts/WalletContext"
+import { SOL_ADDRESS,USR_NAME,
+  USR_TYPE, USR1_TYPE, USR2_TYPE,
+  USR1_ADDRESS,USR1_NAME, USR2_ADDRESS,USR2_NAME, PurchaseTransaction, SECUCHAIN_BRIDGE_URL
+  ,SMMF_CONTRACT_ADDRESS
+} from "../imports/myWallet";
 
 
 interface IssuanceData {
@@ -12,41 +17,110 @@ interface IssuanceData {
   walletAddress: string;
 }
 
-const initMockData: IssuanceData[] = [
-  {
-    id: "2025111400P001",
-    customerId: "C-2025-001",
-    type: "개인",
-    amount: 1000000000,
-    tokenAmount: 1000000000,
-    walletAddress: "0×1234...5678"
-  },
-  {
-    id: "2025111400P001",
-    customerId: "C-2025-001",
-    type: "법인",
-    amount: 1000000000,
-    tokenAmount: 1000000000,
-    walletAddress: "0×1234...5678"
-  },
-  {
-    id: "2025111400P001",
-    customerId: "C-2025-001",
-    type: "개인",
-    amount: 1000000000,
-    tokenAmount: 1000000000,
-    walletAddress: "0×1234...5678"
-  }
+interface UserData {
+  address: string;
+  name: string;
+  type: string;
+}
 
+const initMockData: IssuanceData[] = [];
+
+const initialMockUsers: UserData[] = [
+  { address: SOL_ADDRESS, name: USR_NAME, type: USR_TYPE },
+  { address: USR1_ADDRESS, name: USR1_NAME, type: USR1_TYPE },
+  { address: USR2_ADDRESS, name: USR2_NAME, type: USR2_TYPE },
 ];
 
 
 export default function TokenIssuance() {
   const { wallet, isInitialized } = useMyWallet();
   const [mockData, setMockData] = useState<IssuanceData[]>(initMockData);
+  const [mockUsers] = useState<UserData[]>(initialMockUsers);
   const [amount, setAmount] = useState("0");
   const numericAmount = Number(amount || "0") || 0;
   const formattedAmount = numericAmount.toLocaleString("ko-KR");
+
+  const handleOpenExplorer = (value: string, type: string = "tx") => {
+    window.open(`${SECUCHAIN_BRIDGE_URL}${type}/${value}`, "_blank", "noopener,noreferrer");
+  };
+
+  // recentPurchases를 IssuanceData로 변환하는 함수
+  const convertToIssuanceData = (purchase: PurchaseTransaction, userName: string, userType: string): IssuanceData | null => {
+    if (!purchase) return null;
+
+    const amountNum = Math.floor(parseFloat(purchase.amount));
+
+    // 지갑 주소를 앞 6자리...뒤 4자리 형식으로 변환
+    const shortAddress = `${purchase.from.substring(0, 6)}...${purchase.from.substring(purchase.from.length - 4)}`;
+
+    return {
+      id: purchase.txid,
+      customerId: userName,
+      type: userType,
+      amount: amountNum,
+      tokenAmount: amountNum, // amount와 tokenAmount를 동일하게
+      walletAddress: shortAddress,
+    };
+  };
+
+  // 5초마다 fetchRecentPurchases 호출 및 mockData 업데이트
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const processRecentPurchases = () => {
+      wallet.fetchRecentPurchases();
+
+      if (wallet.recentPurchases.length === 0) return;
+
+      console.log('[TokenIssuance] Recent Purchases:', wallet.recentPurchases);
+
+      // 각 user의 가장 최근 거래만 추적하기 위한 맵
+      const userLatestTx = new Map<string, { purchase: PurchaseTransaction; userName: string; userType: string }>();
+
+      // 모든 recentPurchases를 순회
+      wallet.recentPurchases.forEach((purchase: PurchaseTransaction) => {
+        // mockUsers에 있는 사용자인지 확인
+        const user = mockUsers.find(u => u.address.toLowerCase() === purchase.from.toLowerCase());
+
+        if (user && !userLatestTx.has(user.address)) {
+          // 해당 user의 첫 번째 거래(=가장 최근)만 저장
+          userLatestTx.set(user.address, { purchase, userName: user.name, userType: user.type });
+        }
+      });
+
+      console.log('[TokenIssuance] User latest transactions:', userLatestTx);
+
+      // 변환된 데이터를 mockData에 추가
+      setMockData(prevData => {
+        let newData = [...prevData];
+
+        userLatestTx.forEach(({ purchase, userName, userType }) => {
+          const exists = newData.some(item => item.id === purchase.txid);
+
+          if (!exists) {
+            const converted = convertToIssuanceData(purchase, userName, userType);
+            if (converted) {
+              console.log('[TokenIssuance] Adding new data:', converted);
+              newData = [converted, ...newData];
+            }
+          }
+        });
+
+        return newData;
+      });
+    };
+
+    // 초기 실행
+    processRecentPurchases();
+
+    // 5초마다 실행
+    const intervalId = setInterval(() => {
+      processRecentPurchases();
+    }, 5000);
+
+    // cleanup
+    return () => clearInterval(intervalId);
+  }, [isInitialized, wallet]);
 
   useEffect(() => {
     if (isInitialized) {
@@ -70,7 +144,10 @@ export default function TokenIssuance() {
     return () => clearInterval(intervalId);
   }, [isInitialized, wallet, numericAmount]);
 
-
+  // 발행 예정 건수, 토큰, 금액 계산
+  const issuanceCount = mockData.length;
+  const totalTokenAmount = mockData.reduce((sum, item) => sum + item.tokenAmount, 0);
+  const totalAmount = mockData.reduce((sum, item) => sum + item.amount, 0);
 
   return (
     <div className="bg-gray-100 box-border flex min-h-[calc(100vh-64px)] flex-col gap-[30px] px-[32px] pb-[130px] pt-[32px]">
@@ -104,7 +181,7 @@ export default function TokenIssuance() {
                 </p>
                 <div className="flex items-baseline gap-[8px] h-[48px]">
                   <p className="font-['Pretendard_GOV',sans-serif] font-semibold text-[30px] leading-[48px] text-[#00a63e]">
-                    3
+                    {issuanceCount}
                   </p>
                   <p className="font-['Pretendard_GOV:Regular',sans-serif] text-[16px] leading-[28px] text-[#4a5565]">
                     건
@@ -121,14 +198,14 @@ export default function TokenIssuance() {
                 </p>
                 <div className="flex items-baseline gap-[8px] h-[48px]">
                   <p className="font-['Pretendard_GOV',sans-serif] font-semibold text-[30px] leading-[48px] text-[#00a63e]">
-                    6,500,000,000
+                    {totalTokenAmount.toLocaleString()}
                   </p>
                   <p className="font-['Pretendard_GOV:Regular',sans-serif] text-[16px] leading-[28px] text-[#4a5565]">
                     sMMF
                   </p>
                 </div>
                 <p className="font-['Pretendard_GOV:Regular',sans-serif] text-[12px] leading-[20px] text-[#6a7282]">
-                  
+
                 </p>
               </div>
 
@@ -138,7 +215,7 @@ export default function TokenIssuance() {
                 </p>
                 <div className="flex items-baseline gap-[8px] h-[48px]">
                   <p className="font-['Pretendard_GOV',sans-serif] font-semibold text-[30px] leading-[48px] text-[#00a63e]">
-                    6,500,000,000
+                    {totalAmount.toLocaleString()}
                   </p>
                   <p className="font-['Pretendard_GOV:Regular',sans-serif] text-[16px] leading-[28px] text-[#4a5565]">
                     원
@@ -207,7 +284,7 @@ export default function TokenIssuance() {
                   <div className="absolute h-[69px] left-0 top-0 w-[1374px]" data-name="Table Row">
                     <div aria-hidden="true" className="absolute border-b border-gray-200 inset-0 pointer-events-none" />
                     <div className="absolute h-[69px] left-0 top-0 w-[273.188px]" data-name="Data Cell">
-                      <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic text-[#1e2939] text-nowrap top-[22px] whitespace-pre">{item.id}</p>
+                      <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic text-[#1e2939] text-nowrap top-[22px] whitespace-pre">{item.id.substring(0, 4)}</p>
                     </div>
                     <div className="absolute h-[69px] left-[273.19px] top-0 w-[212.633px]" data-name="Data Cell">
                       <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic text-[rgb(30,41,57)] text-nowrap top-[22px] whitespace-pre">{item.customerId}</p>
@@ -276,7 +353,14 @@ export default function TokenIssuance() {
 
                       {/* Paragraph3 */}
                       <div className="h-[20px] relative shrink-0 w-full" data-name="Paragraph">
-                        <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[20px] left-0 not-italic text-[#4a5565] text-nowrap top-[-0.5px] whitespace-pre">컨트랙트: sMMF (0xabc...def)</p>
+                        <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[20px] left-0 not-italic text-[#4a5565] text-nowrap top-[-0.5px] whitespace-pre">
+                          컨트랙트: <span
+                            className="cursor-pointer hover:text-[#155dfc] transition-colors"
+                            onClick={() => handleOpenExplorer(SMMF_CONTRACT_ADDRESS, "address")}
+                          >
+                            sMMF ({SMMF_CONTRACT_ADDRESS.substring(0, 4)})
+                          </span>
+                        </p>
                       </div>
 
                       {/* Container21 */}
@@ -289,7 +373,7 @@ export default function TokenIssuance() {
                           <div className="size-full">
                             <div className="box-border content-stretch flex flex-col gap-[4px] h-[54px] items-start justify-center pl-[17px] pr-[17px] w-full">
                               <div className="h-[20px] relative shrink-0 w-full" data-name="Text">
-                                <p className="absolute font-['Inter:Regular',sans-serif] font-normal leading-[20px] not-italic text-[#05df72] whitespace-pre w-full">updateNAV(1.0002365000)</p>
+                                <p className="absolute font-['Inter:Regular',sans-serif] font-normal leading-[20px] not-italic text-[#05df72] whitespace-pre w-full">mintSMMF(0x..)</p>
                               </div>
                             </div>
                           </div>
@@ -300,40 +384,16 @@ export default function TokenIssuance() {
                 </div>
 
                 {/* Container17 - Action Button */}
-                <div className="basis-0 box-border content-stretch flex flex-col gap-[24px] grow items-center justify-center min-h-px min-w-px px-px py-[26px] relative rounded-[10px] self-stretch shrink-0 bg-[#f0fdf4]" data-name="Container">
-                  <div aria-hidden="true" className="absolute border border-[#b9f8cf] border-solid inset-0 pointer-events-none rounded-[10px]" />
-                  <div className="relative shrink-0">
-                    <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border content-stretch flex flex-col gap-[15px] items-center relative">
-                      {/* Container16 */}
-                      <div className="content-stretch flex flex-col gap-[8px] h-[52px] items-start relative shrink-0 w-[225.336px]" data-name="Container">
-                        <div className="content-stretch flex flex-col gap-[8px] items-start relative shrink-0 w-full">
-                          <div className="h-[24px] relative shrink-0 w-full" data-name="Heading 4">
-                            <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-[113.11px] not-italic text-[#1e2939] text-center text-nowrap top-[-0.5px] translate-x-[-50%] whitespace-pre">블록체인 발행 준비 완료</p>
-                          </div>
-                          <div className="h-[20px] relative shrink-0 w-full" data-name="Paragraph">
-                            <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[20px] left-[113.5px] not-italic text-[#4a5565] text-center text-nowrap top-[-0.5px] translate-x-[-50%] whitespace-pre">산출된 NAV 값을 블록체인에 기록합니다</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Button */}
-                      <div className="bg-[#00a63e] box-border content-stretch flex gap-[12px] h-[54px] items-center justify-center pl-0 pr-[0.008px] py-0 relative rounded-[10px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] shrink-0 w-[589px]" data-name="Button">
-                        <div className="relative shrink-0 size-[24px]" data-name="Icon">
-                          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                            <g id="Icon">
-                              <path d={svgPaths.p35420c00} id="Vector" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                              <path d={svgPaths.p2727b3e0} id="Vector_2" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                              <path d={svgPaths.p3a4a0d50} id="Vector_3" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                              <path d={svgPaths.p2140db20} id="Vector_4" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                            </g>
-                          </svg>
-                        </div>
-                        <div className="h-[28px] relative shrink-0 w-[196.617px]" data-name="Text">
-                          <div className="bg-clip-padding border-0 border-[transparent] border-solid box-border h-[28px] relative w-[196.617px]">
-                            <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[28px] left-[98.5px] not-italic text-center text-nowrap text-white top-0 translate-x-[-50%] whitespace-pre">09:00 토큰 발행 실행 (3건)</p>
-                          </div>
-                        </div>
-                      </div>
+                <div className="basis-0 grow rounded-[10px] border border-[#b9f8cf] bg-[#f0fdf4] p-[26px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                  <p className="mb-[8px] text-center font-['Pretendard_GOV',sans-serif] font-semibold text-[16px] leading-[24px] text-[#1e2939]">
+                    블록체인 발행 준비 완료
+                  </p>
+                  <p className="mb-[16px] text-center font-['Pretendard_GOV:Regular',sans-serif] text-[14px] leading-[20px] text-[#4a5565]">
+                    발행 대기 목록을 블록체인에 기록합니다
+                  </p>
+                  <div className="flex justify-center">
+                    <div className="flex h-[54px] w-[320px] items-center justify-center gap-[8px] rounded-[10px] bg-[#00a63e] text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+                      <span className="text-[15px] font-medium">09:00 토큰 발행 실행 ({issuanceCount}건)</span>
                     </div>
                   </div>
                 </div>
