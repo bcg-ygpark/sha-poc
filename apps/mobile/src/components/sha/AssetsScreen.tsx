@@ -1,10 +1,23 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Button } from "@digital-wallet/ui";
 import MobileStickyFooter from "../layout/MobileStickyFooter";
 import MobilePageHeader from "../ui/MobilePageHeader";
+import { useMyWallet } from "../../contexts/WalletContext";
 
 export default function AssetsScreen() {
   const navigate = useNavigate();
+  const { wallet, isInitialized } = useMyWallet();
+  const [mmfValue, setMMFValue] = useState("0");
+  const [tokenValue, setTokenValue] = useState("0");
+
+  useEffect(() => {
+    if (isInitialized) {
+      // setAmount(wallet.skrw_balance.toString());
+      setMMFValue(wallet.smmf_balance.toString());
+      setTokenValue(wallet.smmf_balance.toString());
+    }
+  }, [isInitialized, wallet.skrw_balance]);
 
   return (
     <div className="flex min-h-full w-full flex-col bg-white">

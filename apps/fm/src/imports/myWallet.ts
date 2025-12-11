@@ -29,16 +29,68 @@ const ERC1400_ABI = [
 ];
 
 const MMF_ABI = [
+  // ========== ERC20 기본 함수 ==========
   "function name() view returns (string)",
   "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
   "function totalSupply() view returns (uint256)",
+  "function balanceOf(address account) view returns (uint256)",
+  "function transfer(address to, uint256 amount) returns (bool)",
+  "function allowance(address owner, address spender) view returns (uint256)",
+  "function approve(address spender, uint256 amount) returns (bool)",
+  "function transferFrom(address from, address to, uint256 amount) returns (bool)",
+
+  // ========== Share-Based 함수 ==========
+  "function sharesOf(address account) view returns (uint256)",
+  "function getSharesByTokenAmount(uint256 tokenAmount) view returns (uint256)",
+  "function getTokenAmountByShares(uint256 shareAmount) view returns (uint256)",
+
+  // ========== Purchase 함수 ==========
+  "function purchaseWithDT(address buyer, uint256 dtAmount) returns (uint256)",
+  "function processPendingPurchase(address buyer, uint256 index) returns (bool)",
+
+  // ========== Redemption 함수 ==========
+  "function redeemToDT(uint256 tokenAmount) returns (uint256)",
+  "function redeemAll() returns (uint256)",
+
+  // ========== NAV & Rebase 함수 ==========
   "function currentNAV() view returns (uint256)",
+  "function updateNAVAndRebase(uint256 newNAV) returns (bool)",
+  "function lastNAVUpdateTime() view returns (uint256)",
+  "function lastRebaseTime() view returns (uint256)",
+  "function totalRebaseAmount() view returns (uint256)",
+  "function getNAVDecimal() view returns (uint256, uint256)",
+
+  // ========== Lockup 함수 ==========
+  "function lockupUntil(address) view returns (uint256)",
+  "function defaultLockupPeriod() view returns (uint256)",
+  "function getLockupTimeRemaining(address user) view returns (uint256)",
+
+  // ========== Pending Purchase 함수 ==========
+  "function getPendingPurchaseCount(address user) view returns (uint256)",
+  "function getPendingPurchase(address user, uint256 index) view returns (uint256 dtAmount, uint256 timestamp, uint256 navAtPurchase, bool processed)",
+
+  // ========== Access Control 함수 ==========
   "function hasRole(bytes32 role, address account) view returns (bool)",
   "function paused() view returns (bool)",
-  "function purchaseWithDT(address buyer, uint256 dtAmount) returns (uint256)",
-  "function balanceOf(address account) view returns (uint256)",
-  "function lockupUntil(address) view returns (uint256)",
-  "function getPendingPurchaseCount(address user) view returns (uint256)",
+
+  // ========== Admin 함수 ==========
+  "function setDTTokenAddress(address _dtTokenAddress)",
+  "function setDefaultLockupPeriod(uint256 period)",
+  "function setUserLockup(address user, uint256 until)",
+  "function pause()",
+  "function unpause()",
+
+  // ========== Events ==========
+  "event Transfer(address indexed from, address indexed to, uint256 value)",
+  "event Approval(address indexed owner, address indexed spender, uint256 value)",
+  "event TokensPurchased(address indexed buyer, uint256 dtAmount, uint256 tokenAmount, uint256 nav, uint256 timestamp)",
+  "event TokensRedeemed(address indexed redeemer, uint256 tokenAmount, uint256 dtAmount, uint256 nav, uint256 timestamp)",
+  "event NAVUpdated(uint256 oldNAV, uint256 newNAV, uint256 timestamp, address updater)",
+  "event Rebased(uint256 oldTotalSupply, uint256 newTotalSupply, int256 rebaseAmount, uint256 nav, uint256 timestamp)",
+  "event LockupUpdated(address indexed user, uint256 lockupUntil)",
+  "event PurchasePending(address indexed buyer, uint256 dtAmount, uint256 nav, uint256 timestamp)",
+  "event PurchaseProcessed(address indexed buyer, uint256 index, uint256 timestamp)",
 ];
 
 export const SOL_ADDRESS = "0x8DFeB78ecEe391149b1c2739cEd0f6992D0a5663";
@@ -74,6 +126,9 @@ export interface PurchaseTransaction {
 
 export class MyWallet {
   private wallet: Wallet;
+  wallet2: Wallet; // 개인유저1
+  wallet3: Wallet; // 기업유저
+  private walletAdmin: Wallet;
   private provider: JsonRpcProvider;
   balance: number = 0;
 
@@ -95,6 +150,10 @@ export class MyWallet {
     this.provider = new ethers.JsonRpcProvider(PULSE_RPC_URL);
     // 개인키와 프로바이더를 사용하여 지갑 인스턴스를 생성합니다.
     this.wallet = new ethers.Wallet(PRIVATE_KEY, this.provider);
+    this.wallet2 = new ethers.Wallet(USR1_KEY, this.provider);
+    this.wallet3 = new ethers.Wallet(USR2_KEY, this.provider);
+
+    this.walletAdmin = new ethers.Wallet(PULSE_PRIVATE_KEY, this.provider);
   }
 
   /**
@@ -263,6 +322,49 @@ export class MyWallet {
       console.error("[myWallet] Failed to fetch recent purchases:", error);
       this.recentPurchases = [];
     }
+  }
+
+  async mintMMF(
+    address: string,
+    amount: string
+  ): Promise<TransactionResponse | null> {
+    // Admin 권한이 있는 지갑 사용
+    const contract = new ethers.Contract(
+      SMMF_CONTRACT_ADDRESS,
+      MMF_ABI,
+      this.walletAdmin
+    );
+
+    // Asset Manager Role 체크
+    const ASSET_MANAGER_ROLE = ethers.keccak256(
+      ethers.toUtf8Bytes("ASSET_MANAGER_ROLE")
+    );
+    const hasAssetManagerRole = await contract.hasRole(
+      ASSET_MANAGER_ROLE,
+      this.walletAdmin.address
+    );
+    if (!hasAssetManagerRole) {
+      throw new Error("지갑에 ASSET_MANAGER_ROLE 권한이 없습니다.");
+    }
+
+    // Paused 상태 체크
+    const isPaused = await contract.paused();
+    if (isPaused) {
+      throw new Error("컨트랙트가 일시 정지 상태입니다.");
+    }
+
+    if (Number(amount) == 0) {
+      return null;
+    }
+    // amount를 Ether 단위로 변환
+    const amountToSend = ethers.parseEther(amount);
+
+    // purchaseWithDT 실행
+    const tx = await contract.purchaseWithDT(address, amountToSend, {
+      gasLimit: 200000,
+      gasPrice: 0,
+    });
+    return tx;
   }
 }
 

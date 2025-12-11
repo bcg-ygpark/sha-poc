@@ -1,5 +1,5 @@
 import svgPaths from "../imports/svg-dk37z7wkss";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useMyWallet } from "../contexts/WalletContext"
 import { SOL_ADDRESS,USR_NAME,
   USR_TYPE, USR1_TYPE, USR2_TYPE,
@@ -15,6 +15,8 @@ interface IssuanceData {
   amount: number;
   tokenAmount: number;
   walletAddress: string;
+  fullWalletAddress: string; // 전체 주소 (mint용)
+  txid?: string;
 }
 
 interface UserData {
@@ -44,10 +46,33 @@ export default function TokenIssuance() {
     window.open(`${SECUCHAIN_BRIDGE_URL}${type}/${value}`, "_blank", "noopener,noreferrer");
   };
 
+  // txid가 없는 항목들만 발행 대기 목록으로 (Vue의 computed와 유사)
+  const pendingIssuances = useMemo(() => {
+    return mockData.filter(item => !item.txid);
+  }, [mockData]);
+
   const handleTokenIssuance = async () => {
-    
-    
-    
+    for (const item of pendingIssuances) {
+      console.log(item.amount);
+      console.log(item.tokenAmount);
+      console.log(item.fullWalletAddress);
+
+      try {
+        let tx = await wallet.mintMMF(item.fullWalletAddress, item.tokenAmount.toString());
+        if (tx) {
+          console.log(`Transaction sent: ${tx.hash}`);
+          const receipt = await tx.wait(); // 트랜잭션이 블록에 포함될 때까지 대기
+          item.txid = receipt?.hash ?? undefined;
+          console.log(`Transaction confirmed: ${receipt?.hash}`);
+        }
+      } catch (error: any) {
+        console.error(`Failed to mint for ${item.customerId}:`, error);
+        // Known transaction 에러는 무시하고 계속 진행
+        if (error.code !== 'UNKNOWN_ERROR' || !error.info?.error?.message?.includes('Known transaction')) {
+          throw error; // 다른 에러는 throw
+        }
+      }
+    }
   }
   // recentPurchases를 IssuanceData로 변환하는 함수
   const convertToIssuanceData = (purchase: PurchaseTransaction, userName: string, userType: string): IssuanceData | null => {
@@ -65,6 +90,7 @@ export default function TokenIssuance() {
       amount: amountNum,
       tokenAmount: amountNum, // amount와 tokenAmount를 동일하게
       walletAddress: shortAddress,
+      fullWalletAddress: purchase.from, // 전체 주소 저장
     };
   };
 
@@ -149,9 +175,10 @@ export default function TokenIssuance() {
     return () => clearInterval(intervalId);
   }, [isInitialized, wallet, numericAmount]);
 
-  // 발행 예정 건수, 토큰, 금액 계산
-  const issuanceCount = mockData.length;
-  const totalTokenAmount = mockData.reduce((sum, item) => sum + item.tokenAmount, 0);
+  // 발행 예정 건수, 토큰 계산 (txid가 없는 항목만)
+  const issuanceCount = pendingIssuances.length;
+  const totalTokenAmount = pendingIssuances.reduce((sum, item) => sum + item.tokenAmount, 0);
+  // 총 매입 금액은 모든 항목 (발행 완료 + 발행 대기)
   const totalAmount = mockData.reduce((sum, item) => sum + item.amount, 0);
 
   return (
@@ -285,29 +312,36 @@ export default function TokenIssuance() {
 
               {/* Data Rows - 동적 생성 */}
               {mockData.map((item, index) => (
-                <div key={index} className="relative shrink-0 w-full h-[69px]" data-name="Container">
+                <div key={index} className={`relative shrink-0 w-full h-[69px] ${item.txid ? 'bg-gray-50' : ''}`} data-name="Container">
                   <div className="absolute h-[69px] left-0 top-0 w-[1374px]" data-name="Table Row">
                     <div aria-hidden="true" className="absolute border-b border-gray-200 inset-0 pointer-events-none" />
                     <div className="absolute h-[69px] left-0 top-0 w-[273.188px]" data-name="Data Cell">
-                      <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic text-[#1e2939] text-nowrap top-[22px] whitespace-pre">{item.id.substring(0, 4)}</p>
+                      <p className={`absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic ${item.txid ? 'text-[#6a7282]' : 'text-[#1e2939]'} text-nowrap top-[22px] whitespace-pre`}>{item.id.substring(0, 4)}</p>
                     </div>
                     <div className="absolute h-[69px] left-[273.19px] top-0 w-[212.633px]" data-name="Data Cell">
-                      <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic text-[rgb(30,41,57)] text-nowrap top-[22px] whitespace-pre">{item.customerId}</p>
+                      <p className={`absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic ${item.txid ? 'text-[#6a7282]' : 'text-[rgb(30,41,57)]'} text-nowrap top-[22px] whitespace-pre`}>{item.customerId}</p>
                     </div>
                     <div className="absolute h-[69px] left-[485.82px] top-0 w-[148.43px]" data-name="Data Cell">
-                      <div className={`${item.type === "개인" ? "bg-blue-50" : "bg-purple-50"} h-[28px] relative rounded-[14px] top-[20px] w-[41px]`} style={{ left: "53.715px" }}>
+                      <div className={`${item.type === "개인" ? "bg-blue-50" : "bg-purple-50"} h-[28px] relative rounded-[14px] top-[20px] w-[41px] ${item.txid ? 'opacity-50' : ''}`} style={{ left: "53.715px" }}>
                         <div aria-hidden="true" className={`absolute border ${item.type === "개인" ? "border-blue-200" : "border-purple-200"} border-solid inset-0 pointer-events-none rounded-[14px]`} />
                         <p className={`absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[20px] left-[21px] not-italic ${item.type === "개인" ? "text-blue-600" : "text-purple-600"} text-center text-nowrap top-[3.5px] translate-x-[-50%] whitespace-pre text-[14px]`}>{item.type}</p>
                       </div>
                     </div>
                     <div className="absolute h-[69px] left-[634.25px] top-0 w-[258.969px]" data-name="Data Cell">
-                      <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[235.05px] not-italic text-[#1e2939] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">{item.amount.toLocaleString()}원</p>
+                      <p className={`absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[235.05px] not-italic ${item.txid ? 'text-[#6a7282]' : 'text-[#1e2939]'} text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre`}>{item.amount.toLocaleString()}원</p>
                     </div>
                     <div className="absolute h-[69px] left-[893.22px] top-0 w-[237.633px]" data-name="Data Cell">
-                      <p className="absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-[213.71px] not-italic text-[#00a63e] text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre">{item.tokenAmount.toLocaleString()}</p>
+                      <p className={`absolute font-['Pretendard_GOV',sans-serif] font-semibold leading-[24px] left-[213.71px] not-italic ${item.txid ? 'text-[#6a7282]' : 'text-[#00a63e]'} text-nowrap text-right top-[22px] translate-x-[-100%] whitespace-pre`}>{item.tokenAmount.toLocaleString()}</p>
                     </div>
                     <div className="absolute h-[69px] left-[1130.85px] top-0 w-[243.148px]" data-name="Data Cell">
                       <p className="absolute font-['Pretendard_GOV:Regular',sans-serif] leading-[24px] left-[24px] not-italic text-[#6a7282] text-nowrap top-[22px] whitespace-pre">{item.walletAddress}</p>
+                      {item.txid && (
+                        <div className="absolute left-[160px] top-[22px]">
+                          <span className="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs font-medium">
+                            발행완료
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

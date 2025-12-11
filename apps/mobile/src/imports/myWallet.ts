@@ -28,6 +28,26 @@ const ERC1400_ABI = [
   "function decimals() view returns (uint8)",
 ];
 
+const MMF_ABI = [
+  "function decimals() view returns (uint8)",
+  "function transfer(address to, uint256 amount) returns (bool)",
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function totalSupply() view returns (uint256)",
+  "function currentNAV() view returns (uint256)",
+  "function hasRole(bytes32 role, address account) view returns (bool)",
+  "function paused() view returns (bool)",
+  "function purchaseWithDT(address buyer, uint256 dtAmount) returns (uint256)",
+  "function balanceOf(address account) view returns (uint256)",
+  "function lockupUntil(address) view returns (uint256)",
+  "function getPendingPurchaseCount(address user) view returns (uint256)",
+
+  // ========== Share-Based 함수 ==========
+  "function sharesOf(address account) view returns (uint256)",
+  "function getSharesByTokenAmount(uint256 tokenAmount) view returns (uint256)",
+  "function getTokenAmountByShares(uint256 shareAmount) view returns (uint256)",
+];
+
 export const SOL_ADDRESS = "0x8DFeB78ecEe391149b1c2739cEd0f6992D0a5663";
 const PRIVATE_KEY =
   "0x47c496fe62e38aebcf4c5298cdae6889efed27b308fb473311d4a209e512f20e";
@@ -61,6 +81,7 @@ export class MyWallet {
 
   // 기본유저
   smmf_balance: number = 0;
+  smmf_shares: number = 0;
   smmf_decimals: number = 0;
   skrw_balance: number = 0;
   skrw_decimals: number = 0;
@@ -140,11 +161,11 @@ export class MyWallet {
   }
 
   async burnMMF(wallet: Wallet): Promise<TransactionResponse | null> {
-    const MMF_ABI = [
-      "function balanceOf(address owner) view returns (uint256)",
-      "function decimals() view returns (uint8)",
-      "function transfer(address to, uint256 amount) returns (bool)",
-    ];
+    // const MMF_ABI = [
+    //   "function balanceOf(address owner) view returns (uint256)",
+    //   "function decimals() view returns (uint8)",
+    //   "function transfer(address to, uint256 amount) returns (bool)",
+    // ];
     const contract = new ethers.Contract(
       SMMF_CONTRACT_ADDRESS,
       MMF_ABI,
@@ -177,18 +198,18 @@ export class MyWallet {
     amount: string
   ): Promise<TransactionResponse | null> {
     // MMF 컨트랙트 Inline ABI
-    const MMF_ABI = [
-      "function name() view returns (string)",
-      "function symbol() view returns (string)",
-      "function totalSupply() view returns (uint256)",
-      "function currentNAV() view returns (uint256)",
-      "function hasRole(bytes32 role, address account) view returns (bool)",
-      "function paused() view returns (bool)",
-      "function purchaseWithDT(address buyer, uint256 dtAmount) returns (uint256)",
-      "function balanceOf(address account) view returns (uint256)",
-      "function lockupUntil(address) view returns (uint256)",
-      "function getPendingPurchaseCount(address user) view returns (uint256)",
-    ];
+    // const MMF_ABI = [
+    //   "function name() view returns (string)",
+    //   "function symbol() view returns (string)",
+    //   "function totalSupply() view returns (uint256)",
+    //   "function currentNAV() view returns (uint256)",
+    //   "function hasRole(bytes32 role, address account) view returns (bool)",
+    //   "function paused() view returns (bool)",
+    //   "function purchaseWithDT(address buyer, uint256 dtAmount) returns (uint256)",
+    //   "function balanceOf(address account) view returns (uint256)",
+    //   "function lockupUntil(address) view returns (uint256)",
+    //   "function getPendingPurchaseCount(address user) view returns (uint256)",
+    // ];
 
     // Admin 권한이 있는 지갑 사용
     const contract = new ethers.Contract(
@@ -332,13 +353,6 @@ export class MyWallet {
     }
 
     await this.resync();
-    // this.smmf_balance = Number(
-    //   await this.getERC20Balance(SMMF_CONTRACT_ADDRESS, this.provider)
-    // );
-
-    // this.skrw_balance = Number(
-    //   await this.getERC20Balance(SKRW_CONTRACT_ADDRESS, this.provider)
-    // );
   }
 
   async resync(): Promise<void> {
@@ -387,6 +401,13 @@ export class MyWallet {
     );
   }
 
+  async getMMFShares(wallet: Wallet): Promise<number> {
+    const contract = new ethers.Contract(
+      SMMF_CONTRACT_ADDRESS,
+      MMF_ABI,
+      wallet
+    );
+  }
   /**
    * 특정 ERC20 토큰의 잔액을 조회합니다.
    * @param tokenAddress 조회할 ERC20 토큰의 컨트랙트 주소
