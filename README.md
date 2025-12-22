@@ -1,4 +1,4 @@
-# MMF Value Token - PoC Monorepo
+# MMF Value Token - PoC
 
 Share-Based Rebasable MMF Token for Pulse Blockchain - Proof of Concept
 
